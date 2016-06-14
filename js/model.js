@@ -1,5 +1,5 @@
-//从这儿开始定义控件
 
+// 任务走动时跟随控制摄像头
 var CameraFollow = function(a) {
     function b(b, c) {
         var d = b.property;
@@ -20,8 +20,7 @@ var CameraFollow = function(a) {
     }
 },
 
-  
-
+//档案馆模型对象
 demo = {
     LAZY_MIN: 1e3,
     LAZY_MAX: 6e3,
@@ -29,9 +28,11 @@ demo = {
     RES_PATH: "res",
     lastElement: null,
     timer: null,
+    //取资源
     getRes: function(a) {
         return demo.RES_PATH + "/" + a
     },
+
     getEnvMap: function() {
         if (!demo.defaultEnvmap) {
             demo.defaultEnvmap = [];
@@ -249,20 +250,25 @@ demo = {
         demo.resetCamera(b),
         this.initOverview(b)
     },
+
+    //重置摄像头
     resetCamera: function(a) {
         a.getCamera().setPosition(2e3, 1200, 3e3),
         a.getCamera().lookAt(new mono.Vec3(0, 0, 0))
     },
+    //阴影
     dirtyShadowMap: function(a) {
         var b = a.getDataBox().shadowHost,
         c = demo.typeFinder.findFirst("floorCombo");
         demo.updateShadowMap(c, b, b.getId(), a.getDataBox())
     },
+    //隐藏显示模型
     togglePersonVisible: function(a, b) {
         var c = b.getCamera(),
         d = b.getDataBox();
         a ? this.removeObj(d) : this.loadObj(c, d)
     },
+    //移除巡查人员和路线
     removeObj: function(a) {
         var b = demo.typeFinder.find("person").get(0);
         b.animate.stop(),
@@ -270,11 +276,13 @@ demo = {
         var c = demo.typeFinder.find("trail").get(0);
         a.removeByDescendant(c)
     },
+    //打开柜门
     _playRackDoorAnimate: function(a) {
         var b = demo.labelFinder.findFirst(a),
         c = b.getChildren().get(0);
         c.getClient("animation") && demo.playAnimation(c, c.getClient("animation"))
     },
+    //加载巡查人员模型
     loadObj: function(a, b) {
         var c = demo.getRes("worker.obj"),
         d = demo.getRes("worker.mtl"),
@@ -331,6 +339,7 @@ demo = {
             b.add(n)
         })
     },
+    //绘制巡查路线
     createPathAnimates: function(a, b, c, d, e, f) {
         var g = [];
         if (c && c.length > 0) {
@@ -395,43 +404,44 @@ demo = {
         for (var s, l = 0; l < g.length; l++) l > 0 ? (g[l - 1].chain(g[l]), d && l == g.length - 1 && g[l].chain(s)) : s = g[l];
         return s
     },
-    toggleConnectionView: function(a) {
-        a.connectionView = !a.connectionView;
-        var b = a.connectionView,
-        c = a.getDataBox(),
-        d = demo.typeFinder.find("connection"),
-        e = demo.typeFinder.find("rail");
-        d.forEach(function(a) {
-            if (a.setVisible(b), a.billboard || (a.billboard = new mono.Billboard, a.billboard.s({
-                "m.texture.image": demo.createConnectionBillboardImage("0"),
-                "m.vertical": !0
-            }), a.billboard.setScale(60, 30, 1), a.billboard.setPosition(400, 230, 330), c.add(a.billboard)), a.billboard.setVisible(b), a.isVisible()) {
-                var d = new twaver.Animate({
-                    from: 0,
-                    to: 1,
-                    type: "number",
-                    dur: 1e3,
-                    repeat: Number.POSITIVE_INFINITY,
-                    reverse: !1,
-                    onUpdate: function(b) {
-                        if (a.s({
-                            "m.texture.offset": new mono.Vec2(b, 0)
-                        }), 1 === b) {
-                            var c = "54" + parseInt(10 * Math.random()) + "." + parseInt(100 * Math.random());
-                            a.billboard.s({
-                                "m.texture.image": demo.createConnectionBillboardImage(c)
-                            })
-                        }
-                    }
-                });
-                d.play(),
-                a.offsetAnimate = d
-            } else a.offsetAnimate && a.offsetAnimate.stop()
-        }),
-        e.forEach(function(a) {
-            a.setVisible(b)
-        })
-    },
+
+    // toggleConnectionView: function(a) {
+    //     a.connectionView = !a.connectionView;
+    //     var b = a.connectionView,
+    //     c = a.getDataBox(),
+    //     d = demo.typeFinder.find("connection"),
+    //     e = demo.typeFinder.find("rail");
+    //     d.forEach(function(a) {
+    //         if (a.setVisible(b), a.billboard || (a.billboard = new mono.Billboard, a.billboard.s({
+    //             "m.texture.image": demo.createConnectionBillboardImage("0"),
+    //             "m.vertical": !0
+    //         }), a.billboard.setScale(60, 30, 1), a.billboard.setPosition(400, 230, 330), c.add(a.billboard)), a.billboard.setVisible(b), a.isVisible()) {
+    //             var d = new twaver.Animate({
+    //                 from: 0,
+    //                 to: 1,
+    //                 type: "number",
+    //                 dur: 1e3,
+    //                 repeat: Number.POSITIVE_INFINITY,
+    //                 reverse: !1,
+    //                 onUpdate: function(b) {
+    //                     if (a.s({
+    //                         "m.texture.offset": new mono.Vec2(b, 0)
+    //                     }), 1 === b) {
+    //                         var c = "54" + parseInt(10 * Math.random()) + "." + parseInt(100 * Math.random());
+    //                         a.billboard.s({
+    //                             "m.texture.image": demo.createConnectionBillboardImage(c)
+    //                         })
+    //                     }
+    //                 }
+    //             });
+    //             d.play(),
+    //             a.offsetAnimate = d
+    //         } else a.offsetAnimate && a.offsetAnimate.stop()
+    //     }),
+    //     e.forEach(function(a) {
+    //         a.setVisible(b)
+    //     })
+    // },
     setupLights: function(a) {
         var b = new mono.PointLight(16777215, .3);
         b.setPosition(0, 1e3, -1e3),
@@ -444,6 +454,8 @@ demo = {
         a.add(b),
         a.add(new mono.AmbientLight("white"))
     },
+
+    //双击事件
     handleDoubleClick: function(a, b) {
         var c = b.getCamera(),
         d = b.getDefaultInteraction(),
@@ -452,6 +464,7 @@ demo = {
             var f = e.element,
             g = e.point,
             h = c.getTarget();
+
             if (f.getClient("animation")) demo.playAnimation(f, f.getClient("animation"));
             else if (f.getClient("dbl.func")) {
                 var i = f.getClient("dbl.func");
@@ -464,6 +477,7 @@ demo = {
         }
         demo._handleDoubleClick(f, b)
     },
+     //双击统计图
     _handleDoubleClick: function(a, b) {
         if ("tv" === a.getClient("type")) {
             var c = document.createElement("iframe");
@@ -472,8 +486,13 @@ demo = {
             c.setAttribute("frameBorder", 0),
             c.setAttribute("src", "chart.html"),
             demo.showDialog(c, "档案馆统计", 850, 600)
+        }else if("rack"=== a.getClient("type")){
+            a.setClient("animation", "pullOut.x")
+            //此处实现档案柜挪动效果
+            //console.log("rack");
         }
     },
+    //鼠标移动事件
     handleMouseMove: function(a, b, c) {
         var d = b.getElementsByMouseEvent(a),
         e = null,
@@ -494,6 +513,7 @@ demo = {
         null == e && (f.style.display = "none"),
         window.lastEvent = a
     },
+
     copyProperties: function(a, b, c) {
         if (a && b) for (var d in a) c && c.indexOf(d) >= 0 || (b[d] = a[d])
     },
@@ -616,17 +636,19 @@ demo = {
         f = c + "-top.m.lightmap.image";
         a.setStyle(f, e)
     },
+    //形成柜子里的文档
     loadRackContent: function(a, b, c, d, e, f, g, h, i, j, k, l, m) {
         for (var n = 10,
         o = 2,
-        p = !1; f - 20 > n;) {
-            var q = parseInt(3 * Math.random()) + 1,
-            r = "server" + q + ".jpg";
-            3 === q && (r = "server3.png");
-            var s = (3 === q || n > 100) && !p && h ? h.color: null,
+        p = !1; f - 28 > n;) {
+            //var q = parseInt(3 * Math.random()) + 1,
+            //r = "server" + q + ".jpg";
+            var r="server3.png";
+            //3 === q && (r = "server3.png");
+            var s = (n > 100) && !p && h ? h.color: null,
             t = this.createServer(a, i, j, r, s, m),
             u = t.getBoundingBox().size();
-            if (s && (p = !0), t.setPositionY(n + u.y / 2 - f / 2), t.setPositionZ(t.getPositionZ() + 5), t.setParent(l), n = n + u.y + o, n > 200) {
+            if (s && (p = !0), t.setPositionY(n + u.y / 2 - f / 2), t.setPositionZ(t.getPositionZ() + 5), t.setParent(l), n = n + u.y + o, n > 180) {
                 a.removeByDescendant(t, !0);
                 break
             }
@@ -635,8 +657,8 @@ demo = {
 
     createServer: function(a, b, c, d, e, f) {
         var g = {
-            "server1.jpg": 25,
-            "server2.jpg": 25,
+            // "server1.jpg": 25,
+            // "server2.jpg": 25,
             "server3.png": 25
         },
         h = (b.getPositionX(), b.getPositionZ(), c.getWidth()),
@@ -644,7 +666,6 @@ demo = {
         j = c.getDepth(),
         k = new mono.Cube(h - 2, i - 2, j - 4),
         l = e ? e: "#5B6976";
-        alert(b.getPositionX+"=="+b.getPositionY+"=="+getPositionZ);
         k.s({
             "m.color": l,
             "m.ambient": l,
@@ -841,7 +862,7 @@ demo = {
     //移动动画效果
     animatePullOut: function(a, b, c) {
         var d = a.getBoundingBox().size().multiply(a.getScale()),
-        e = .8,
+        e = 1,
         f = new mono.Vec3(0, 0, 1),
         g = 0;
         "x" === b && (f = new mono.Vec3(1, 0, 0), g = d.x),
@@ -1647,6 +1668,7 @@ demo = {
         }
     }
 };
+
 
 // 绘制地板
 demo.registerFilter("floor",
