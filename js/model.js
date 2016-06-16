@@ -1,5 +1,5 @@
 
-// 任务走动时跟随控制摄像头
+// 人物走动时跟随控制摄像头
 var CameraFollow = function(a) {
     function b(b, c) {
         var d = b.property;
@@ -10,7 +10,7 @@ var CameraFollow = function(a) {
             a.lookAt(e),
             a.setPosition(g)
         }
-    }
+     }
     this.setHost = function(c) {
         a._hostNode && a._hostNode.removePropertyChangeListener(b),
         a._hostNode = c,
@@ -276,7 +276,7 @@ demo = {
         var c = demo.typeFinder.find("trail").get(0);
         a.removeByDescendant(c)
     },
-    //打开柜门
+    //自动打开柜门
     _playRackDoorAnimate: function(a) {
         var b = demo.labelFinder.findFirst(a),
         c = b.getChildren().get(0);
@@ -487,7 +487,7 @@ demo = {
             c.setAttribute("src", "chart.html"),
             demo.showDialog(c, "档案馆统计", 850, 600)
         }else if("rack"=== a.getClient("type")){
-            a.setClient("animation", "pullOut.x")
+             a.setClient("animation", "pullOut.x");
             //此处实现档案柜挪动效果
             //console.log("rack");
         }
@@ -517,6 +517,7 @@ demo = {
     copyProperties: function(a, b, c) {
         if (a && b) for (var d in a) c && c.indexOf(d) >= 0 || (b[d] = a[d])
     },
+    //绘制档案柜
     createCubeObject: function(a) {
         var b = a.translate || [0, 0, 0],
         c = a.width,
@@ -657,8 +658,8 @@ demo = {
 
     createServer: function(a, b, c, d, e, f) {
         var g = {
-            // "server1.jpg": 25,
-            // "server2.jpg": 25,
+            "server3.png": 25,
+            "server3.png": 25,
             "server3.png": 25
         },
         h = (b.getPositionX(), b.getPositionZ(), c.getWidth()),
@@ -695,13 +696,13 @@ demo = {
         r = .9897,
         h = h + 2,
         i = i + 1,
-        s = (h - 2 * q) / 14, t = 14, u = 0; t > u; u++) {
+        s = (h - 2 * q) / 4, t = 4, u = 0; t > u; u++) {
             var v = "#FFFFFF";
             u > 5 && !p && (v = e, p = !0);
             var w = {
                 height: i - 2 * r,
                 width: s,
-                depth: .4 * j,
+                depth:j,
                 pic: demo.RES_PATH + "/card" + (u % 4 + 1) + ".png",
                 color: v
             },
@@ -722,7 +723,7 @@ demo = {
         c = b[0],
         d = b[1],
         e = b[2],
-        f = a.width || 10,
+        f = a.width || 35,
         g = a.height || 50,
         h = a.depth || 50,
         i = a.rotate || [0, 0, 0],
@@ -746,9 +747,9 @@ demo = {
         },
         {
             type: "cube",
-            width: 1,
+            width:  .85 * f,
             height: .95 * g,
-            depth: h,
+            depth: .95 * h,
             translate: [c, d, e - h / 2 + 1],
             rotate: i,
             op: "+",
@@ -756,8 +757,9 @@ demo = {
                 "m.color": j,
                 "m.ambient": j,
                 "m.texture.image": demo.getRes("gray.png"),
-                "left.m.texture.image": demo.getRes("card_body.png"),
-                "right.m.texture.image": demo.getRes("card_body.png"),
+                "top.m.texture.image": demo.getRes("card_body.png"),
+                "left.m.texture.image": demo.getRes("rack_inside.jpg"),
+                "right.m.texture.image": demo.getRes("rack_inside.jpg"),
                 "left.m.texture.flipX": !0,
                 "m.transparent": !0,
                 "m.lightmap.image": demo.getRes("outside_lightmap.jpg")
@@ -2215,12 +2217,12 @@ function(a, b) {
     l = b.shadow,
     m = new mono.Cube(g, h, i);
     m.s({
-        "m.color": "#557E7A",
+        "m.color": "#dedede",
         "left.m.lightmap.image": demo.getRes("outside_lightmap.jpg"),
         "right.m.lightmap.image": demo.getRes("outside_lightmap.jpg"),
         "front.m.lightmap.image": demo.getRes("outside_lightmap.jpg"),
         "back.m.lightmap.image": demo.getRes("outside_lightmap.jpg"),
-        "top.m.normalmap.image": demo.getRes("metal_normalmap.jpg"),
+         "top.m.normalmap.image": demo.getRes("metal_normalmap.jpg"),
         "left.m.normalmap.image": demo.getRes("metal_normalmap.jpg"),
         "right.m.normalmap.image": demo.getRes("metal_normalmap.jpg"),
         "back.m.normalmap.image": demo.getRes("metal_normalmap.jpg"),
@@ -2232,14 +2234,16 @@ function(a, b) {
         "left.m.envmap.image": demo.getEnvMap(),
         "right.m.envmap.image": demo.getEnvMap(),
         "back.m.envmap.image": demo.getEnvMap(),
-        "m.ambient": "#557E7A",
+        "m.ambient": "#E1FFFF",
         "m.type": "phong",
         "m.specularStrength": 50,
-        "front.m.texture.image": demo.getRes("rack.jpg"),
+        "front.m.texture.image": demo.getRes("rack.png"),
+        "front.m.transparent": true,
+        "top.m.specularmap.image": demo.getRes("white.png"),
         "front.m.texture.repeat": new mono.Vec2(1, 1),
         "front.m.specularmap.image": demo.getRes("white.png"),
-        "front.m.color": "#666",
-        "front.m.ambient": "#666",
+        "front.m.color": "#fff",
+        "front.m.ambient": "#fff",
         "front.m.specularStrength": 200
     }),
     m.setPosition(d, h / 2 + 1 + e, f);
@@ -2251,61 +2255,8 @@ function(a, b) {
     m.setClient("origin", m.getPosition().clone()),
     m.setClient("loaded", !1),
     m.shadow = l;
-    var o = new mono.Cube(g, h, 2);
-    o.s({
-        "m.type": "phong",
-        "m.color": "#A5F1B5",
-        "m.ambient": "#A4F4EC",
-        "front.m.texture.image": demo.getRes("rack_front_door.jpg"),
-        "back.m.texture.image": demo.getRes("rack_door_back.jpg"),
-        "m.envmap.image": demo.getEnvMap()
-    }),
-    o.setParent(m),
-    m.door = o,
-    o.setPosition(0, 0, i / 2 + 1),
-    o.setClient("animation", "rotate.right.100"),
-    o.setClient("type", "rack.door"),
-    o.setClient("animation.done.func",
-    function() {
-        if (!m.getClient("loaded") && o.getClient("animated")) {
-            var b = m.clone();
-            b.s({
-                "m.color": "red",
-                "m.ambient": "red",
-                "m.texture.image": null,
-                "top.m.normalmap.image": demo.getRes("outside_lightmap.jpg"),
-                "top.m.specularmap.image": demo.getRes("white.png")
-            }),
-            b.setDepth(b.getDepth() - 2),
-            b.setWidth(b.getWidth() - 2),
-            a.add(b),
-            m.s({
-                "m.transparent": !0,
-                "m.opacity": .5
-            }),
-            new twaver.Animate({
-                from: 0,
-                to: b.getHeight(),
-                dur: 2e3,
-                easing: "easeOut",
-                onUpdate: function(a) {
-                    b.setHeight(a),
-                    b.setPositionY(a / 2)
-                },
-                onDone: function() {
-                    a.remove(b),
-                    m.s({
-                        "m.transparent": !1,
-                        "m.opacity": 1
-                    });
-                    var c = m.getClient("rack.loader");
-                    c && o.getClient("animated") && !m.getClient("loaded") && (c(), m.setClient("loaded", !0), m.getClient("loaded.func") && m.getClient("loaded.func")(m))
-                }
-            }).play()
-        }
-    });
-    var p = function(a, b, c, d, e, f, g) {
-        var h = new mono.Cube(.75 * b, c - 10, .7 * d);
+     var p = function(a, b, c, d, e, f, g) {
+        var h = new mono.Cube(.8 * b, c - 10, .7 * d);
         h.s({
             "m.color": "#333333",
             "m.ambient": "#333333",
@@ -2318,6 +2269,7 @@ function(a, b) {
             "top.m.lightmap.image": demo.getRes("floor.jpg")
         }),
         h.setPosition(0, 0, d / 2 - h.getDepth() / 2 + 1),
+
         a.remove(f),
         f.alarm && a.getAlarmBox().remove(f.alarm);
         var i = f.clone();
@@ -2337,7 +2289,7 @@ function(a, b) {
         }),
         demo.loadRackContent(a, k, m, n, b, c, d, e, i, h, g, j, f)
     };
-    if (a.add(m), a.add(o), j) {
+    if (a.add(m), j) { 
         var q = new mono.Alarm(m.getId(), m.getId(), j);
         m.setStyle("alarm.billboard.vertical", !0),
         m.alarm = q,
@@ -2346,7 +2298,10 @@ function(a, b) {
     var r = function() {
         p(a, g, h, i, j, m, b)
     };
-    m.setClient("rack.loader", r)
+    m.setClient("rack.loader", r);
+
+    var c = m.getClient("rack.loader");
+    c && !m.getClient("loaded") && (c(), m.setClient("loaded", !0), m.getClient("loaded.func") && m.getClient("loaded.func")(m));
 }),
 demo.registerCreator("plant",
 function(a, b) {
