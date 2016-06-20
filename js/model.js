@@ -24,7 +24,7 @@ var CameraFollow = function(a) {
 demo = {
     LAZY_MIN: 1e3,
     LAZY_MAX: 6e3,
-    CLEAR_COLOR: "#39609B",
+    CLEAR_COLOR: "#000000",
     RES_PATH: "res",
     lastElement: null,
     timer: null,
@@ -69,7 +69,7 @@ demo = {
         demo.typeFinder = new mono.QuickFinder(b.getDataBox(), "type", "client"),
         demo.labelFinder = new mono.QuickFinder(b.getDataBox(), "label", "client");
         var c = new mono.PerspectiveCamera(15, 1.5, 30, 3e4);
-        b.setCamera(c);
+           b.setCamera(c);
         var d = new mono.DefaultInteraction(b);
         d.yLowerLimitAngle = Math.PI / 180 * 2,
         d.yUpLimitAngle = Math.PI / 2,
@@ -100,32 +100,32 @@ demo = {
                 demo.resetView(b)
             }
         },
+        // {
+        //     label: "走线管理",
+        //     icon: "connection.png",
+        //     clickFunction: function() {
+        //         //var a = b.connectionView;
+        //         demo.resetView(b)
+        //         //a || demo.toggleConnectionView(b)
+        //     }
+        // },
+        // {
+        //     label: "人工路径",
+        //     icon: "person.png",
+        //     clickFunction: function() {
+        //         demo.togglePersonVisible(g, b),
+        //         g = !g
+        //     }
+        // },
+        // {
+        //     label: "调试信息",
+        //     icon: "fps.png",
+        //     clickFunction: function() {
+        //         demo.toggleFpsView(b)
+        //     }
+        // },
         {
-            label: "走线管理",
-            icon: "connection.png",
-            clickFunction: function() {
-                var a = b.connectionView;
-                demo.resetView(b),
-                a || demo.toggleConnectionView(b)
-            }
-        },
-        {
-            label: "人工路径",
-            icon: "person.png",
-            clickFunction: function() {
-                demo.togglePersonVisible(g, b),
-                g = !g
-            }
-        },
-        {
-            label: "调试信息",
-            icon: "fps.png",
-            clickFunction: function() {
-                demo.toggleFpsView(b)
-            }
-        },
-        {
-            label: "拖拽机柜",
+            label: "拖拽柜子",
             icon: "edit.png",
             clickFunction: function() {
                 var a = b.moveView;
@@ -134,7 +134,7 @@ demo = {
             }
         },
         {
-            label: "温度图",
+            label: "馆内温度",
             icon: "temperature.png",
             clickFunction: function() {
                 var a = b.temperatureView;
@@ -152,7 +152,7 @@ demo = {
             }
         },
         {
-            label: "机柜利用率",
+            label: "柜子利用率",
             icon: "usage.png",
             clickFunction: function() {
                 var a = b.usageView;
@@ -161,7 +161,7 @@ demo = {
             }
         },
         {
-            label: "空调风向",
+            label: "通风方向",
             icon: "air.png",
             clickFunction: function() {
                 var a = b.airView;
@@ -196,15 +196,15 @@ demo = {
                 a || demo.toggleLaserView(b)
             }
         },
-        {
-            label: "供电电缆",
-            icon: "power.png",
-            clickFunction: function() {
-                var a = b.powerView;
-                demo.resetView(b),
-                a || demo.togglePowerView(b)
-            }
-        },
+        // {
+        //     label: "供电电缆",
+        //     icon: "power.png",
+        //     clickFunction: function() {
+        //         var a = b.powerView;
+        //         demo.resetView(b),
+        //         a || demo.togglePowerView(b)
+        //     }
+        // },
         {
             label: "告警巡航",
             icon: "alarm.png",
@@ -963,7 +963,7 @@ demo = {
         a.temperatureView = !a.temperatureView,
         a.getDataBox().forEach(function(b) {
             var c = b.getClient("type");
-            if (("rack" === c || "rack.door" === c) && (b.setVisible(!a.temperatureView), "rack" === c)) {
+            if (("rack" === c) && (b.setVisible(!a.temperatureView), "rack" === c)) {
                 if (!b.temperatureFake) {
                     var d = new mono.Cube(b.getWidth(), b.getHeight(), b.getDepth());
                     b.temperatureFake = d;
@@ -1018,7 +1018,7 @@ demo = {
     },
     //温度热点图强
     createTemperatureWall: function(a) {
-        var b = new mono.Cube(990, 200, 10);
+        var b = new mono.Cube(390, 200, 10);
         b.s({
             "m.visible": !1
         }),
@@ -1028,7 +1028,7 @@ demo = {
             "m.side": mono.DoubleSide,
             "m.type": "phong"
         }),
-        b.setPosition(0, b.getHeight() / 2, 400),
+        b.setPosition(0, b.getHeight() / 2, 100),
         b.setRotationX(Math.PI),
         a.add(b),
         a.temperatureWall = b
@@ -1048,7 +1048,7 @@ demo = {
         a.spaceView = !a.spaceView,
         a.getDataBox().forEach(function(b) {
             var c = b.getClient("type");
-            if (("rack" === c || "rack.door" === c) && (b.setVisible(!a.spaceView), "rack" === c)) {
+            if (("rack" === c) && (b.setVisible(!a.spaceView), "rack" === c)) {
                 b.spaceCubes || (b.spaceCubes = demo.createRackSpaceCubes(a.getDataBox(), b));
                 for (var d = 0; d < b.spaceCubes.length; d++) b.spaceCubes[d].setPosition(b.getPositionX(), b.spaceCubes[d].getPositionY(), b.getPositionZ()),
                 b.spaceCubes[d].setVisible(a.spaceView)
@@ -1057,7 +1057,7 @@ demo = {
     },
     //档案柜可用空间模型
     createRackSpaceCubes: function(a, b) {
-        for (var c = [], d = b.getWidth(), e = b.getHeight(), f = b.getDepth(), g = 42, h = e / g, i = 0, j = ["#8A0808", "#088A08", "#088A85", "#6A0888", "#B18904"], k = !1; 42 > i;) {
+        for (var c = [], d = b.getWidth(), e = b.getHeight(), f = b.getDepth(), g = 42, h = e / g, i = 0, j = ["#8A0808", "#088A08", "#088A85", "#6A0888", "#B18904", "#B18924"], k = !1; 42 > i;) {
             var l = parseInt(1 + 5 * Math.random());
             k = !k;
             var m = k ? j[l - 1] : "#A4A4A4";
@@ -1245,45 +1245,46 @@ demo = {
         demo.showDialog(b, a, 610, 280)
     },
 
-    createConnectionBillboardImage: function(a) {
-        var b = 512,
-        c = 256,
-        d = "当前网络流量",
-        e = document.createElement("canvas");
-        e.width = b,
-        e.height = c;
-        var f = e.getContext("2d");
-        f.fillStyle = "#FE642E",
-        f.fillRect(0, 0, b, c - c / 6),
-        f.beginPath(),
-        f.moveTo(.2 * b, 0),
-        f.lineTo(b / 2, c),
-        f.lineTo(.8 * b, 0),
-        f.fill();
-        var g = "white";
-        f.font = '40px "Microsoft Yahei" ',
-        f.fillStyle = g,
-        f.textAlign = "left",
-        f.textBaseline = "middle",
-        f.fillText(d, c / 10, c / 5);
-        var g = "white";
-        return d = a,
-        f.font = '100px "Microsoft Yahei" ',
-        f.fillStyle = g,
-        f.textAlign = "left",
-        f.textBaseline = "middle",
-        f.fillText(d, c / 10, c / 2),
-        f.strokeStyle = g,
-        f.lineWidth = 4,
-        f.strokeText(d, c / 10, c / 2),
-        d = "Mb/s",
-        f.font = '50px "Microsoft Yahei" ',
-        f.fillStyle = g,
-        f.textAlign = "right",
-        f.textBaseline = "middle",
-        f.fillText(d, b - c / 10, c / 2 + 20),
-        e
-    },
+    //显示提示内容
+    // createConnectionBillboardImage: function(a) {
+    //     var b = 512,
+    //     c = 256,
+    //     d = "当前网络流量",
+    //     e = document.createElement("canvas");
+    //     e.width = b,
+    //     e.height = c;
+    //     var f = e.getContext("2d");
+    //     f.fillStyle = "#FE642E",
+    //     f.fillRect(0, 0, b, c - c / 6),
+    //     f.beginPath(),
+    //     f.moveTo(.2 * b, 0),
+    //     f.lineTo(b / 2, c),
+    //     f.lineTo(.8 * b, 0),
+    //     f.fill();
+    //     var g = "white";
+    //     f.font = '40px "Microsoft Yahei" ',
+    //     f.fillStyle = g,
+    //     f.textAlign = "left",
+    //     f.textBaseline = "middle",
+    //     f.fillText(d, c / 10, c / 5);
+    //     var g = "white";
+    //     return d = a,
+    //     f.font = '100px "Microsoft Yahei" ',
+    //     f.fillStyle = g,
+    //     f.textAlign = "left",
+    //     f.textBaseline = "middle",
+    //     f.fillText(d, c / 10, c / 2),
+    //     f.strokeStyle = g,
+    //     f.lineWidth = 4,
+    //     f.strokeText(d, c / 10, c / 2),
+    //     d = "Mb/s",
+    //     f.font = '50px "Microsoft Yahei" ',
+    //     f.fillStyle = g,
+    //     f.textAlign = "right",
+    //     f.textBaseline = "middle",
+    //     f.fillText(d, b - c / 10, c / 2 + 20),
+    //     e
+    // },
 
     inspection: function(a) {
         var b, c, d;
@@ -1404,21 +1405,22 @@ demo = {
         demo.resetCamera(a);
         var b = [];
         a.getDataBox().forEach(function(a) {
-            "rack" === a.getClient("type") && a.oldRack && b.push(a)
+            "rack" === a.getClient("type") && a.oldRack && b.push(a);
         });
         for (var c = 0; c < b.length; c++) {
             var d = b[c],
             e = d.oldRack;
             d.alarm && a.getDataBox().getAlarmBox().remove(d.alarm),
             a.getDataBox().removeByDescendant(d, !0),
-            a.getDataBox().add(e),
-            e.alarm && a.getDataBox().getAlarmBox().add(e.alarm),
-            e.door.setParent(e),
-            e.setClient("loaded", !1);
-            var f = e.door;
-            a.getDataBox().add(f),
-            f.getClient("animated") && demo.playAnimation(f, f.getClient("animation"))
+            a.getDataBox().add(e)
+            e.alarm && a.getDataBox().getAlarmBox().add(e.alarm)
+            // e.door.setParent(e),
+            // e.setClient("loaded", !1);
+           // var f = e.door;
+            // a.getDataBox().add(f),
+           // f.getClient("animated") && demo.playAnimation(f, f.getClient("animation"))
         }
+
         var g = [];
         a.getDataBox().forEach(function(a) { ("left-door" === a.getClient("type") || "right-door" === a.getClient("type")) && g.push(a)
         });
@@ -1431,7 +1433,7 @@ demo = {
         a.usageView && demo.toggleUsageView(a),
         a.airView && demo.toggleAirView(a),
         a.moveView && demo.toggleMoveView(a),
-        a.connectionView && demo.toggleConnectionView(a),
+        //a.connectionView && demo.toggleConnectionView(a),
         a.smokeView && demo.toggleSmokeView(a),
         a.waterView && demo.toggleWaterView(a),
         a.laserView && demo.toggleLaserView(a),
@@ -2249,12 +2251,13 @@ function(a, b) {
     m.setPosition(d, h / 2 + 1 + e, f);
     var n = demo.generateAssetImage(k);
     m.setStyle("right.m.lightmap.image", n),
-    m.setStyle("right.m.specularmap.image", n),
+    m.setStyle("top.m.specularmap.image", n),
     m.setClient("label", k),
     m.setClient("type", "rack"),
     m.setClient("origin", m.getPosition().clone()),
     m.setClient("loaded", !1),
     m.shadow = l;
+
      var p = function(a, b, c, d, e, f, g) {
         var h = new mono.Cube(.8 * b, c - 10, .7 * d);
         h.s({
@@ -2289,18 +2292,25 @@ function(a, b) {
         }),
         demo.loadRackContent(a, k, m, n, b, c, d, e, i, h, g, j, f)
     };
+
     if (a.add(m), j) { 
         var q = new mono.Alarm(m.getId(), m.getId(), j);
         m.setStyle("alarm.billboard.vertical", !0),
         m.alarm = q,
         a.getAlarmBox().add(q)
     }
+
     var r = function() {
         p(a, g, h, i, j, m, b)
     };
     m.setClient("rack.loader", r);
 
     var c = m.getClient("rack.loader");
+     /*
+      c=function() {
+          p(a, g, h, i, j, m, b)
+      };
+    */
     c && !m.getClient("loaded") && (c(), m.setClient("loaded", !0), m.getClient("loaded.func") && m.getClient("loaded.func")(m));
 }),
 demo.registerCreator("plant",
@@ -2961,6 +2971,7 @@ var dataJson = {
     //     flow: -.05,
     //     data: [[ - 177, -100, -250], [ - 177, -100, -150], [ - 177, -50, -150], [ - 177, -50, -247], [ - 177, 0, -247], [ - 397, 0, -247], [ - 397, 0, 247], [403, 0, 247], [403, -50, 247], [403, -50, 350], [403, -100, 350], [403, -100, 250]]
     // },
+
     {
         type: "camera",
         translate: [80, 200, -270]
@@ -2989,6 +3000,7 @@ var dataJson = {
         type: "extinguisher",
         translate: [ -180, 240]
     },
+    
     // {
     //     type: "smoke",
     //     translate: [300, 180, 240],
