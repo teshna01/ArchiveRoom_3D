@@ -3,14 +3,55 @@
   <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <title>荣成市三维档案馆</title>
-    <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" type="text/css" href="./css/style.css">
   </head>
   
   <body onload='demo.init("3d_view")' style="margin:0px;">
       <div id="3d_view">
       	
       </div>
-
      <script type="text/javascript" src="./js/twaver.js"></script>
      <script type="text/javascript" src="./js/model.js"></script>
+     <script type="text/javascript">
+
+      var indexNode={
+        indexConsole:function(a,str){
+          console.log("from index.html:"+str);
+            var html=createHtml();
+             toggleTable(a,html);
+           }
+       
+        }
+
+       
+      function createHtml(){
+         var nameArr=["刘杰","管理员","张腾腾","测试A","陌生人"];
+         var dabh=["0125-REFA-2016-0000006","0125-REFA-2016-0000009","0125-REFA-2016-0000008","0125-REFA-2016-00000011","0125-REFA-2016-0000015"];
+         var a = document.createElement("table");
+         a.setAttribute("class", "gridtable");
+         for (var b = 0; 8 > b; b++) {
+            var c = document.createElement("tr");
+            a.appendChild(c);
+            for (var d = 0; 6> d; d++) {
+                var e = 0 == b ? "th": "td",
+                f = document.createElement(e);
+                c.appendChild(f),
+                0 == b ? (0 == d && (f.innerHTML = "档案编号"), 1 == d && (f.innerHTML = "权利人"), 2== d && (f.innerHTML = "立卷人"),3 == d && (f.innerHTML = "立卷时间"), 4 == d && (f.innerHTML = "密级"),5 == d && (f.innerHTML = "详情")) : (0 == d && (f.innerHTML = dabh[parseInt(4 * Math.random())]),1 == d && (f.innerHTML = (nameArr[parseInt(3*Math.random())])),2 == d && (f.innerHTML = (nameArr[parseInt(3*Math.random())])), 3 == d && (f.innerHTML = (new Date).format("yyyy-MM-dd h:mm ")), 4 == d && (Math.random() > .5 ? f.innerHTML = "内部": f.innerHTML = '公开'),5 == d && (f.innerHTML = '<a href="#">查看</a>'))
+            }
+        }
+         return a;
+      }
+
+       //弹出隐藏表
+       function toggleTable(a,strHtml) {
+        var isAnim= a.getClient("animated");
+        if(isAnim){
+          demo.showDialog(strHtml,"入棺人员纪录", 500, 260)
+        }else{
+          var e = document.getElementById("dialog");
+                   document.body.removeChild(e);
+        }
+        
+    }
+     </script>
 </html>

@@ -32,7 +32,7 @@ demo = {
     getRes: function(a) {
         return demo.RES_PATH + "/" + a
     },
-
+    //取环境地图
     getEnvMap: function() {
         if (!demo.defaultEnvmap) {
             demo.defaultEnvmap = [];
@@ -109,14 +109,7 @@ demo = {
         //         //a || demo.toggleConnectionView(b)
         //     }
         // },
-        // {
-        //     label: "人工路径",
-        //     icon: "person.png",
-        //     clickFunction: function() {
-        //         demo.togglePersonVisible(g, b),
-        //         g = !g
-        //     }
-        // },
+        
         // {
         //     label: "调试信息",
         //     icon: "fps.png",
@@ -169,17 +162,17 @@ demo = {
                 a || demo.toggleAirView(b)
             }
         },
+        // {
+        //     label: "烟雾监控",
+        //     icon: "smoke.png",
+        //     clickFunction: function() {
+        //         var a = b.smokeView;
+        //         demo.resetView(b),
+        //         a || demo.toggleSmokeView(b)
+        //     }
+        // },
         {
-            label: "烟雾监控",
-            icon: "smoke.png",
-            clickFunction: function() {
-                var a = b.smokeView;
-                demo.resetView(b),
-                a || demo.toggleSmokeView(b)
-            }
-        },
-        {
-            label: "漏水监测",
+            label: "环境监察",
             icon: "water.png",
             clickFunction: function() {
                 var a = b.waterView;
@@ -187,15 +180,15 @@ demo = {
                 a || demo.toggleWaterView(b)
             }
         },
-        {
-            label: "防盗监测",
-            icon: "security.png",
-            clickFunction: function() {
-                var a = b.laserView;
-                demo.resetView(b),
-                a || demo.toggleLaserView(b)
-            }
-        },
+        // {
+        //     label: "防盗监测",
+        //     icon: "security.png",
+        //     clickFunction: function() {
+        //         var a = b.laserView;
+        //         demo.resetView(b),
+        //         a || demo.toggleLaserView(b)
+        //     }
+        // },
         // {
         //     label: "供电电缆",
         //     icon: "power.png",
@@ -210,6 +203,14 @@ demo = {
             icon: "alarm.png",
             clickFunction: function() {
                 b.inspecting || (demo.resetView(b), demo.resetRackPosition(b), b.inspecting = !0, demo.inspection(b))
+            }
+        },
+        {
+            label: "人工路径",
+            icon: "person.png",
+            clickFunction: function() {
+                demo.togglePersonVisible(g, b),
+                g = !g
             }
         }];
         demo.setupToolbar(h),
@@ -245,7 +246,7 @@ demo = {
         demo.loadData(b);
         var j = (new Date).getTime();
         console.log("time:  " + (j - i)),
-        demo.startSmokeAnimation(b),
+        // demo.startSmokeAnimation(b),
         demo.startFpsAnimation(b),
         demo.resetCamera(b),
         this.initOverview(b)
@@ -284,7 +285,8 @@ demo = {
     },
     //加载巡查人员模型
     loadObj: function(a, b) {
-        var c = demo.getRes("worker.obj"),
+        //a:camera   b:dabaBox
+    var c = demo.getRes("worker.obj"),
         d = demo.getRes("worker.mtl"),
         e = new mono.OBJMTLLoader;
         e.load(c, d, {
@@ -301,12 +303,12 @@ demo = {
                 })
             };
             d(c);
-            var e = -650,
-            f = 600,
+            var e = -260,
+            f = 500,
             g = 0;
             c.setPosition(e, 0, f),
             c.setRotationY(g);
-            var h = [[ - 350, 600], [ - 350, 400], [450, 400], [450, 100], [ - 200, 100], [ - 200, -100], [ - 370, -100], [ - 370, -150]],
+            var h = [[  100, 500], [  100, 100], [-90, 100],[-90,50]],
             i = new CameraFollow(a);
             i.setHost(c);
             var j = demo.typeFinder.findFirst("left-door"),
@@ -488,8 +490,12 @@ demo = {
             demo.showDialog(c, "档案馆统计", 850, 600)
         }else if("rack"=== a.getClient("type")){
              a.setClient("animation", "pullOut.x");
-            //此处实现档案柜挪动效果
-            //console.log("rack");
+        }else if(a.getClient("BID")){ //a.getClient("SID" 
+            var cardCode=a.getClient("BID");
+            indexNode.indexConsole(a,cardCode);
+        }else if(a.getClient("SID")){
+          var serCode=a.getClient("SID");
+           indexNode.indexConsole(a,serCode);
         }
     },
     //鼠标移动事件
@@ -641,13 +647,13 @@ demo = {
     loadRackContent: function(a, b, c, d, e, f, g, h, i, j, k, l, m) {
         for (var n = 10,
         o = 2,
-        p = !1; f - 28 > n;) {
+        p = !1,num=1; f - 28 > n;num++) {
             //var q = parseInt(3 * Math.random()) + 1,
             //r = "server" + q + ".jpg";
             var r="server3.png";
             //3 === q && (r = "server3.png");
             var s = (n > 100) && !p && h ? h.color: null,
-            t = this.createServer(a, i, j, r, s, m),
+            t = this.createServer(a, i, j, r, s, m,num,l),//num:cardNumber l:档案柜对象
             u = t.getBoundingBox().size();
             if (s && (p = !0), t.setPositionY(n + u.y / 2 - f / 2), t.setPositionZ(t.getPositionZ() + 5), t.setParent(l), n = n + u.y + o, n > 180) {
                 a.removeByDescendant(t, !0);
@@ -656,7 +662,8 @@ demo = {
         }
     },
 
-    createServer: function(a, b, c, d, e, f) {
+    createServer: function(a, b, c, d, e, f,num,serObj) {
+        var serCode=serObj.getClient("label");
         var g = {
             "server3.png": 25,
             "server3.png": 25,
@@ -691,6 +698,7 @@ demo = {
             })
         }
         var o = new mono.ComboNode([k, m], ["+"]);
+            o.setClient("SID",serCode+"_"+num);
         if (o.setClient("animation", "pullOut.z"), o.setPosition(.5, 0, -5), a.add(o), "server3.png" == d) for (var p = !1,
         q = 2.1008,
         r = .9897,
@@ -698,6 +706,7 @@ demo = {
         i = i + 1,
         s = (h - 2 * q) / 4, t = 4, u = 0; t > u; u++) {
             var v = "#FFFFFF";
+            
             u > 5 && !p && (v = e, p = !0);
             var w = {
                 height: i - 2 * r,
@@ -710,7 +719,7 @@ demo = {
             a.add(x),
             x.setParent(o),
             x.setClient("type", "card"),
-            x.setClient("BID", "card-" + u),
+            x.setClient("BID", serCode+"_"+num+"_" + u+1),
             x.setClient("isAlarm", "#FFFFFF" != v),
             x.p( - h / 2 + q + (u + .5) * s, -i / 2 + r, m.getPositionZ() - 1),
             x.setClient("animation", "pullOut.z"),
@@ -1201,8 +1210,8 @@ demo = {
     //显示对话框
     showDialog: function(a, b, c, d) {
         b = b || "",
-        c = c || 600,
-        d = d || 400;
+        c = c || "600px",
+        d = d || "400px";
         var e = document.getElementById("dialog");
         e && document.body.removeChild(e),
         e = document.createElement("div"),
@@ -1211,8 +1220,8 @@ demo = {
         e.style.position = "absolute",
         e.style.left = "100px",
         e.style.top = "100px",
-        e.style.width = c + "px",
-        e.style.height = d + "px",
+        e.style.width = c+"px" ,
+        e.style.height = d+"px",
         e.style.background = "rgba(164,186,223,0.75)",
         e.style["border-radius"] = "5px",
         document.body.appendChild(e);
@@ -1436,7 +1445,7 @@ demo = {
         //a.connectionView && demo.toggleConnectionView(a),
         a.smokeView && demo.toggleSmokeView(a),
         a.waterView && demo.toggleWaterView(a),
-        a.laserView && demo.toggleLaserView(a),
+        // a.laserView && demo.toggleLaserView(a),
         a.powerView && demo.togglePowerView(a)
     },
     //重置档案柜的位置
@@ -1448,30 +1457,31 @@ demo = {
     },
     //密码门锁点击弹出对话框
     showDoorTable: function() {
+        var nameArr=["刘杰","管理员","张腾腾","测试A","陌生人"];
         var a = document.createElement("table");
         a.setAttribute("class", "gridtable");
         for (var b = 0; 8 > b; b++) {
             var c = document.createElement("tr");
             a.appendChild(c);
-            for (var d = 0; 3 > d; d++) {
+            for (var d = 0; 4> d; d++) {
                 var e = 0 == b ? "th": "td",
                 f = document.createElement(e);
                 c.appendChild(f),
-                0 == b ? (0 == d && (f.innerHTML = "#"), 1 == d && (f.innerHTML = "Time"), 2 == d && (f.innerHTML = "Activity")) : (0 == d && (f.innerHTML = parseInt(1e3 * Math.random())), 1 == d && (f.innerHTML = (new Date).format("yyyy h:mm")), 2 == d && (Math.random() > .5 ? f.innerHTML = "Door access allowed": f.innerHTML = "Instant Alart - Door access denied"))
+                0 == b ? (0 == d && (f.innerHTML = "#"), 1 == d && (f.innerHTML = "操作人"),2 == d && (f.innerHTML = "时间"), 3 == d && (f.innerHTML = "行为")) : (0 == d && (f.innerHTML = parseInt(1e3 * Math.random())),1 == d && (f.innerHTML = (nameArr[parseInt(3*Math.random())])), 2 == d && (f.innerHTML = (new Date).format("yyyy h:mm")), 3 == d && (Math.random() > .5 ? f.innerHTML = "入棺被拒绝": f.innerHTML = "入棺成功"))
             }
         }
-        demo.showDialog(a, "Door Security Records", 330, 240)
+        demo.showDialog(a, "入棺人员纪录", 250, 260)
     },
 
-    toggleSmokeView: function(a) {
-        a.smokeView = !a.smokeView,
-        a.getDataBox().forEach(function(b) {
-            var c = b.getClient("type"); ("smoke" === c || "extinguisher_arrow" === c) && b.setVisible(a.smokeView)
-        })
-    },
-    startSmokeAnimation: function(a) {
-        setInterval(demo.updateSmoke(a), 200)
-    },
+    // toggleSmokeView: function(a) {
+    //     a.smokeView = !a.smokeView,
+    //     a.getDataBox().forEach(function(b) {
+    //         var c = b.getClient("type"); ("smoke" === c || "extinguisher_arrow" === c) && b.setVisible(a.smokeView)
+    //     })
+    // },
+    // startSmokeAnimation: function(a) {
+    //     setInterval(demo.updateSmoke(a), 200)
+    // },
     //启动EPS动画
     startFpsAnimation: function(a) {
         var b = document.createElement("span");
@@ -1541,6 +1551,7 @@ demo = {
         }),
         b.setScale(80, 160, 1),
         b.setPosition(50, 90, 50),
+        b.setClient("name", "alarm_alert"),
         a.add(b);
         var c = new mono.Sphere(30);
         c.s({
@@ -1557,12 +1568,12 @@ demo = {
         a.add(c),
         a.waterLeakingObjects = [b, c]
     },
-    toggleLaserView: function(a) {
-        a.laserView = !a.laserView,
-        a.getDataBox().forEach(function(b) {
-            "laser" === b.getClient("type") && b.setVisible(a.laserView)
-        })
-    },
+    // toggleLaserView: function(a) {
+    //     a.laserView = !a.laserView,
+    //     a.getDataBox().forEach(function(b) {
+    //         "laser" === b.getClient("type") && b.setVisible(a.laserView)
+    //     })
+    // },
     setupControlBar: function(a) {
         var b = document.createElement("div");
         b.setAttribute("id", "toolbar"),
@@ -2290,7 +2301,7 @@ function(a, b) {
         var p = f.getChildren();
         p.forEach(function(a) { ! a || a instanceof mono.Billboard || a.setParent(j)
         }),
-        demo.loadRackContent(a, k, m, n, b, c, d, e, i, h, g, j, f)
+        demo.loadRackContent(a, k, m, n, b, c, d, e, i, h, g, f, j)
     };
 
     if (a.add(m), j) { 
@@ -2705,8 +2716,8 @@ demo.createAirPlanes = function() {
     var a = [],
     b = new mono.Path;
     b.moveTo(0, 0, 0),
-    b.curveTo(0, 80, 30, 0, 100, 150),
-    b.curveTo(0, 120, 200, 0, 200, 230);
+    b.curveTo(0,100,-100,-100,180,-180);
+    // b.curveTo(0,120, -200, -200, 200, -200);
     var c = function(a, c, d) {
         var e = new mono.Path;
         e.moveTo(0, 0, 0),
@@ -2720,8 +2731,8 @@ demo.createAirPlanes = function() {
             "m.transparent": !0,
             "m.gradient": {
                 0 : "#84DF29",
-                .6 : "#DF6029",
-                1 : "#DF2929"
+                .6 : "#00BFFF",
+                1 : "#4169E1"
             },
             "m.gradientType": 2
         });
@@ -2740,9 +2751,9 @@ demo.createAirPlanes = function() {
         return f.airAnimation = g,
         f
     };
-    return a.push(c(450, -10, 150)),
-    a.push(c(195, -310, 150)),
-    a.push(c(250, -400, -350)),
+    return a.push(c(390, -190, 180)),
+    // a.push(c(195, -310, 150)),
+    // a.push(c(250, -400, -350)),
     a
 },
 demo.registerFilter("water_cable",
@@ -2778,91 +2789,91 @@ demo.createWaterCable = function(a, b, c, d) {
     e.setClient("type", "water_cable"),
     e.setVisible(!1),
     e
-},
-demo.registerFilter("laser",
-function(a, b) {
-    var c = function(a, b) {
-        a.add(demo.createLaser(a, b))
-    },
-    d = function(a, b) {
-        return function() {
-            c(a, b)
-        }
-    };
-    setTimeout(d(a, b), demo.getRandomLazyTime())
-}),
-demo.createLaser = function(a, b) {
-    var c = Math.atan2(b.to[1] - b.from[1], b.to[0] - b.from[0]),
-    d = 1.5,
-    e = d * Math.sin(c),
-    f = d * Math.cos(c),
-    g = d * Math.sin(c + Math.PI),
-    h = d * Math.cos(c + Math.PI),
-    i = new mono.Cylinder(5, 5, 170);
-    i.s({
-        "m.texture.image": demo.getRes("rack_inside.jpg"),
-        "m.texture.repeat": new mono.Vec2(1, 3),
-        "m.color": "#A4A4A4",
-        "m.ambient": "#A4A4A4",
-        "m.type": "phong",
-        "m.specularStrength": 10
-    }),
-    i.setPosition(b.from[0], i.getHeight() / 2, b.from[1]),
-    i.setClient("type", "laser"),
-    i.setVisible(!1),
-    a.add(i);
-    var j = new mono.Cylinder(4, 4, 130);
-    j.s({
-        "m.type": "phong",
-        "m.color": "#A9F5D0",
-        "m.ambient": "#A9F5D0",
-        "m.envmap.image": demo.getEnvMap()
-    }),
-    j.setParent(i),
-    j.setPosition(f, 0, e),
-    j.setClient("type", "laser"),
-    j.setVisible(!1),
-    a.add(j);
-    var k = i.clone();
-    k.setPosition(b.to[0], k.getHeight() / 2, b.to[1]),
-    k.setClient("type", "laser"),
-    k.setVisible(!1),
-    a.add(k);
-    var l = j.clone();
-    l.setParent(k),
-    l.setPosition(h, 0, g),
-    l.setClient("type", "laser"),
-    l.setVisible(!1),
-    a.add(l);
-    for (var m = "red",
-    n = 0; 5 > n; n++) {
-        var o = new mono.Cube(1, 1, 1);
-        o.s({
-            "m.color": m,
-            "m.ambient": m
-        }),
-        o.setPosition(b.from[0], 30 + 27 * n, b.from[1]),
-        o.setClient("type", "laser"),
-        o.setVisible(!1),
-        a.add(o);
-        var p = o.clone();
-        p.setPosition(b.to[0], 30 + 27 * n, b.to[1]),
-        p.setClient("type", "laser"),
-        p.setVisible(!1),
-        a.add(p);
-        var q = new mono.Link(o, p);
-        q.s({
-            "m.color": m,
-            "m.ambient": m,
-            "m.type": "phong",
-            "m.transparent": !0,
-            "m.opacity": .7
-        }),
-        q.setClient("type", "laser"),
-        q.setVisible(!1),
-        a.add(q)
-    }
 };
+// demo.registerFilter("laser",
+// function(a, b) {
+//     var c = function(a, b) {
+//         a.add(demo.createLaser(a, b))
+//     },
+//     d = function(a, b) {
+//         return function() {
+//             c(a, b)
+//         }
+//     };
+//     setTimeout(d(a, b), demo.getRandomLazyTime())
+// }),
+// demo.createLaser = function(a, b) {
+//     var c = Math.atan2(b.to[1] - b.from[1], b.to[0] - b.from[0]),
+//     d = 1.5,
+//     e = d * Math.sin(c),
+//     f = d * Math.cos(c),
+//     g = d * Math.sin(c + Math.PI),
+//     h = d * Math.cos(c + Math.PI),
+//     i = new mono.Cylinder(5, 5, 170);
+//     i.s({
+//         "m.texture.image": demo.getRes("rack_inside.jpg"),
+//         "m.texture.repeat": new mono.Vec2(1, 3),
+//         "m.color": "#A4A4A4",
+//         "m.ambient": "#A4A4A4",
+//         "m.type": "phong",
+//         "m.specularStrength": 10
+//     }),
+//     i.setPosition(b.from[0], i.getHeight() / 2, b.from[1]),
+//     i.setClient("type", "laser"),
+//     i.setVisible(!1),
+//     a.add(i);
+//     var j = new mono.Cylinder(4, 4, 130);
+//     j.s({
+//         "m.type": "phong",
+//         "m.color": "#A9F5D0",
+//         "m.ambient": "#A9F5D0",
+//         "m.envmap.image": demo.getEnvMap()
+//     }),
+//     j.setParent(i),
+//     j.setPosition(f, 0, e),
+//     j.setClient("type", "laser"),
+//     j.setVisible(!1),
+//     a.add(j);
+//     var k = i.clone();
+//     k.setPosition(b.to[0], k.getHeight() / 2, b.to[1]),
+//     k.setClient("type", "laser"),
+//     k.setVisible(!1),
+//     a.add(k);
+//     var l = j.clone();
+//     l.setParent(k),
+//     l.setPosition(h, 0, g),
+//     l.setClient("type", "laser"),
+//     l.setVisible(!1),
+//     a.add(l);
+//     for (var m = "red",
+//     n = 0; 5 > n; n++) {
+//         var o = new mono.Cube(1, 1, 1);
+//         o.s({
+//             "m.color": m,
+//             "m.ambient": m
+//         }),
+//         o.setPosition(b.from[0], 30 + 27 * n, b.from[1]),
+//         o.setClient("type", "laser"),
+//         o.setVisible(!1),
+//         a.add(o);
+//         var p = o.clone();
+//         p.setPosition(b.to[0], 30 + 27 * n, b.to[1]),
+//         p.setClient("type", "laser"),
+//         p.setVisible(!1),
+//         a.add(p);
+//         var q = new mono.Link(o, p);
+//         q.s({
+//             "m.color": m,
+//             "m.ambient": m,
+//             "m.type": "phong",
+//             "m.transparent": !0,
+//             "m.opacity": .7
+//         }),
+//         q.setClient("type", "laser"),
+//         q.setVisible(!1),
+//         a.add(q)
+//     }
+// };
 var dataJson = {
     objects: [{
         type: "floor",
